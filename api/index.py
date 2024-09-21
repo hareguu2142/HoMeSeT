@@ -45,10 +45,10 @@ def upload_to_github_binary(path, content, commit_message, is_binary=False):
         encoded_content = base64.b64encode(content).decode('utf-8') if is_binary else content
         try:
             existing_file = repo.get_contents(path)
-            repo.update_file(path, commit_message, encoded_content, existing_file.sha, branch="master")
+            repo.update_file(path, commit_message, encoded_content, existing_file.sha, branch="main")
         except GithubException as e:
             if e.status == 404:
-                repo.create_file(path, commit_message, encoded_content, branch="master")
+                repo.create_file(path, commit_message, encoded_content, branch="main")
             else:
                 raise e
     except GithubException as e:
