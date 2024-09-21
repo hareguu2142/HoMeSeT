@@ -57,7 +57,8 @@ def upload_to_github_binary(path, content, commit_message, is_binary=False):
 
 @app.route('/')
 def index():
-    posts = collection.find().sort('date', -1)
+    # 최근 5개의 게시물만 가져오도록 수정
+    posts = collection.find().sort('date', -1).limit(5)
     return render_template('index.html', posts=posts)
 
 @app.route('/upload', methods=['GET', 'POST'])
