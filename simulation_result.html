@@ -1,0 +1,871 @@
+
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <title>시뮬레이션 결과</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+            }
+            h1, h2 {
+                color: #2E8B57;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 30px;
+            }
+            th, td {
+                border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+            .highlight {
+                background-color: #FFD700;
+                font-weight: bold;
+            }
+            .title {
+                background-color: #2E8B57;
+                color: white;
+                text-align: center;
+                padding: 10px 0;
+                margin-bottom: 20px;
+            }
+            /* vis.js 네트워크 스타일 */
+            #network {
+                width: 100%;
+                height: 600px;
+                border: 1px solid lightgray;
+            }
+        </style>
+        <!-- vis.js 최신 라이브러리 불러오기 -->
+        <script type="text/javascript" src="https://unpkg.com/vis-network@9.4.0/dist/vis-network.min.js"></script>
+        <link href="https://unpkg.com/vis-network@9.4.0/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <div class="title">
+            <h1>조건을 만족하는 시뮬레이션 결과</h1>
+        </div>
+        <p>시도 횟수: 13121</p>
+        
+        <h2>점수 분포</h2>
+        <table>
+            <tr>
+                <th>플레이어</th>
+                <th>점수</th>
+            </tr>
+    
+            <tr>
+                <td class="highlight">Player_3</td>
+                <td class="highlight">8점</td>
+            </tr>
+            
+            <tr>
+                <td class="highlight">Player_6</td>
+                <td class="highlight">8점</td>
+            </tr>
+            
+            <tr>
+                <td class="highlight">Player_10</td>
+                <td class="highlight">8점</td>
+            </tr>
+            
+            <tr>
+                <td>Player_1</td>
+                <td>4점</td>
+            </tr>
+            
+            <tr>
+                <td>Player_7</td>
+                <td>4점</td>
+            </tr>
+            
+            <tr>
+                <td>Player_2</td>
+                <td>3점</td>
+            </tr>
+            
+            <tr>
+                <td>Player_5</td>
+                <td>3점</td>
+            </tr>
+            
+            <tr>
+                <td>Player_8</td>
+                <td>3점</td>
+            </tr>
+            
+            <tr>
+                <td>Player_9</td>
+                <td>3점</td>
+            </tr>
+            
+            <tr>
+                <td>Player_4</td>
+                <td>1점</td>
+            </tr>
+            
+        </table>
+        
+        <h2>승패 기록</h2>
+        <table>
+            <tr>
+                <th>플레이어</th>
+                <th>승리</th>
+                <th>패배</th>
+            </tr>
+    
+            <tr>
+                <td>Player_1</td>
+                <td>Player_4, Player_5, Player_7, Player_8</td>
+                <td>Player_2, Player_3, Player_6, Player_9, Player_10</td>
+            </tr>
+            
+            <tr>
+                <td>Player_2</td>
+                <td>Player_1, Player_8, Player_9</td>
+                <td>Player_3, Player_4, Player_5, Player_6, Player_7, Player_10</td>
+            </tr>
+            
+            <tr>
+                <td class="highlight">Player_3</td>
+                <td class="highlight">Player_1, Player_2, Player_4, Player_5, Player_6, Player_7, Player_8, Player_9</td>
+                <td class="highlight">Player_10</td>
+            </tr>
+            
+            <tr>
+                <td>Player_4</td>
+                <td>Player_2</td>
+                <td>Player_1, Player_3, Player_5, Player_6, Player_7, Player_8, Player_9, Player_10</td>
+            </tr>
+            
+            <tr>
+                <td>Player_5</td>
+                <td>Player_2, Player_4, Player_8</td>
+                <td>Player_1, Player_3, Player_6, Player_7, Player_9, Player_10</td>
+            </tr>
+            
+            <tr>
+                <td class="highlight">Player_6</td>
+                <td class="highlight">Player_1, Player_2, Player_4, Player_5, Player_7, Player_8, Player_9, Player_10</td>
+                <td class="highlight">Player_3</td>
+            </tr>
+            
+            <tr>
+                <td>Player_7</td>
+                <td>Player_2, Player_4, Player_5, Player_9</td>
+                <td>Player_1, Player_3, Player_6, Player_8, Player_10</td>
+            </tr>
+            
+            <tr>
+                <td>Player_8</td>
+                <td>Player_4, Player_7, Player_9</td>
+                <td>Player_1, Player_2, Player_3, Player_5, Player_6, Player_10</td>
+            </tr>
+            
+            <tr>
+                <td>Player_9</td>
+                <td>Player_1, Player_4, Player_5</td>
+                <td>Player_2, Player_3, Player_6, Player_7, Player_8, Player_10</td>
+            </tr>
+            
+            <tr>
+                <td class="highlight">Player_10</td>
+                <td class="highlight">Player_1, Player_2, Player_3, Player_4, Player_5, Player_7, Player_8, Player_9</td>
+                <td class="highlight">Player_6</td>
+            </tr>
+            
+        </table>
+        
+        <h2>경기 결과 그래프</h2>
+        <div id="network"></div>
+        
+        <script type="text/javascript">
+            // 노드 및 간선 데이터 로드
+            var nodes = new vis.DataSet([
+    {
+        "id": "Player_3",
+        "label": "Player_3\n8점",
+        "shape": "circle",
+        "color": {
+            "background": "#FFD700",
+            "border": "#2E8B57",
+            "highlight": {
+                "background": "#FFD700",
+                "border": "#2E8B57"
+            }
+        },
+        "font": {
+            "color": "black",
+            "size": 14,
+            "bold": true
+        }
+    },
+    {
+        "id": "Player_6",
+        "label": "Player_6\n8점",
+        "shape": "circle",
+        "color": {
+            "background": "#FFD700",
+            "border": "#2E8B57",
+            "highlight": {
+                "background": "#FFD700",
+                "border": "#2E8B57"
+            }
+        },
+        "font": {
+            "color": "black",
+            "size": 14,
+            "bold": true
+        }
+    },
+    {
+        "id": "Player_10",
+        "label": "Player_10\n8점",
+        "shape": "circle",
+        "color": {
+            "background": "#FFD700",
+            "border": "#2E8B57",
+            "highlight": {
+                "background": "#FFD700",
+                "border": "#2E8B57"
+            }
+        },
+        "font": {
+            "color": "black",
+            "size": 14,
+            "bold": true
+        }
+    },
+    {
+        "id": "Player_1",
+        "label": "Player_1\n4점",
+        "shape": "circle",
+        "color": {
+            "background": "#97C2FC",
+            "border": "#2E8B57",
+            "highlight": {
+                "background": "#97C2FC",
+                "border": "#2E8B57"
+            }
+        },
+        "font": {
+            "color": "black",
+            "size": 14,
+            "bold": true
+        }
+    },
+    {
+        "id": "Player_7",
+        "label": "Player_7\n4점",
+        "shape": "circle",
+        "color": {
+            "background": "#97C2FC",
+            "border": "#2E8B57",
+            "highlight": {
+                "background": "#97C2FC",
+                "border": "#2E8B57"
+            }
+        },
+        "font": {
+            "color": "black",
+            "size": 14,
+            "bold": true
+        }
+    },
+    {
+        "id": "Player_2",
+        "label": "Player_2\n3점",
+        "shape": "circle",
+        "color": {
+            "background": "#97C2FC",
+            "border": "#2E8B57",
+            "highlight": {
+                "background": "#97C2FC",
+                "border": "#2E8B57"
+            }
+        },
+        "font": {
+            "color": "black",
+            "size": 14,
+            "bold": true
+        }
+    },
+    {
+        "id": "Player_5",
+        "label": "Player_5\n3점",
+        "shape": "circle",
+        "color": {
+            "background": "#97C2FC",
+            "border": "#2E8B57",
+            "highlight": {
+                "background": "#97C2FC",
+                "border": "#2E8B57"
+            }
+        },
+        "font": {
+            "color": "black",
+            "size": 14,
+            "bold": true
+        }
+    },
+    {
+        "id": "Player_8",
+        "label": "Player_8\n3점",
+        "shape": "circle",
+        "color": {
+            "background": "#97C2FC",
+            "border": "#2E8B57",
+            "highlight": {
+                "background": "#97C2FC",
+                "border": "#2E8B57"
+            }
+        },
+        "font": {
+            "color": "black",
+            "size": 14,
+            "bold": true
+        }
+    },
+    {
+        "id": "Player_9",
+        "label": "Player_9\n3점",
+        "shape": "circle",
+        "color": {
+            "background": "#97C2FC",
+            "border": "#2E8B57",
+            "highlight": {
+                "background": "#97C2FC",
+                "border": "#2E8B57"
+            }
+        },
+        "font": {
+            "color": "black",
+            "size": 14,
+            "bold": true
+        }
+    },
+    {
+        "id": "Player_4",
+        "label": "Player_4\n1점",
+        "shape": "circle",
+        "color": {
+            "background": "#97C2FC",
+            "border": "#2E8B57",
+            "highlight": {
+                "background": "#97C2FC",
+                "border": "#2E8B57"
+            }
+        },
+        "font": {
+            "color": "black",
+            "size": 14,
+            "bold": true
+        }
+    }
+]);
+            var edges = new vis.DataSet([
+    {
+        "from": "Player_1",
+        "to": "Player_4",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_1",
+        "to": "Player_5",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_1",
+        "to": "Player_7",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_1",
+        "to": "Player_8",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_2",
+        "to": "Player_1",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_2",
+        "to": "Player_8",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_2",
+        "to": "Player_9",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_3",
+        "to": "Player_1",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_3",
+        "to": "Player_2",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_3",
+        "to": "Player_4",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_3",
+        "to": "Player_5",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_3",
+        "to": "Player_6",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_3",
+        "to": "Player_7",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_3",
+        "to": "Player_8",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_3",
+        "to": "Player_9",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_4",
+        "to": "Player_2",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_5",
+        "to": "Player_2",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_5",
+        "to": "Player_4",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_5",
+        "to": "Player_8",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_6",
+        "to": "Player_1",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_6",
+        "to": "Player_2",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_6",
+        "to": "Player_4",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_6",
+        "to": "Player_5",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_6",
+        "to": "Player_7",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_6",
+        "to": "Player_8",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_6",
+        "to": "Player_9",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_6",
+        "to": "Player_10",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_7",
+        "to": "Player_2",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_7",
+        "to": "Player_4",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_7",
+        "to": "Player_5",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_7",
+        "to": "Player_9",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_8",
+        "to": "Player_4",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_8",
+        "to": "Player_7",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_8",
+        "to": "Player_9",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_9",
+        "to": "Player_1",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_9",
+        "to": "Player_4",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_9",
+        "to": "Player_5",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_10",
+        "to": "Player_1",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_10",
+        "to": "Player_2",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_10",
+        "to": "Player_3",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_10",
+        "to": "Player_4",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_10",
+        "to": "Player_5",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_10",
+        "to": "Player_7",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_10",
+        "to": "Player_8",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    },
+    {
+        "from": "Player_10",
+        "to": "Player_9",
+        "arrows": "to",
+        "color": {
+            "color": "#848484",
+            "highlight": "#848484"
+        },
+        "width": 1
+    }
+]);
+            
+            // 네트워크 데이터
+            var data = {
+                nodes: nodes,
+                edges: edges
+            };
+            
+            // 네트워크 옵션
+            var options = {
+                layout: {
+                    improvedLayout: true,
+                    hierarchical: false
+                },
+                edges: {
+                    smooth: {
+                        type: 'cubicBezier',
+                        forceDirection: 'horizontal',
+                        roundness: 0.4
+                    },
+                    arrows: {
+                        to: {enabled: true, scaleFactor:1}
+                    },
+                    color: {
+                        color: '#848484',
+                        highlight: '#848484'
+                    }
+                },
+                physics: {
+                    stabilization: false,
+                    barnesHut: {
+                        gravitationalConstant: -30000,
+                        springLength: 250,
+                        springConstant: 0.001
+                    }
+                },
+                interaction: {
+                    hover: true,
+                    tooltipDelay: 200
+                }
+            };
+            
+            // 네트워크 생성
+            var container = document.getElementById('network');
+            var network = new vis.Network(container, data, options);
+        </script>
+    </body>
+    </html>
+    

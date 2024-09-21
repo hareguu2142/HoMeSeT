@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>새 글 업로드</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #34495e;
+        }
+        input[type="text"], input[type="date"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            resize: vertical;
+        }
+        input[type="file"] {
+            margin-bottom: 15px;
+        }
+        input[type="submit"] {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: #2980b9;
+        }
+        .flash-messages {
+            list-style-type: none;
+            padding: 0;
+        }
+        .flash-messages li {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .home-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+        }
+        .home-link:hover {
+            text-decoration: underline;
+        }
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .image-preview img {
+            max-width: 150px;
+            max-height: 150px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        #uploadStatus {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>새 글 업로드</h1>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flash-messages">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <form method="post" enctype="multipart/form-data" id="uploadForm">
+        <label for="name">HTML의 이름:</label>
+        <input type="text" name="name" id="name" required readonly>
+
+        <label for="title">글 제목:(게시물 목록에 실제로 보이는 부분입니다.)</label>
+        <input type="text" name="title" id="title" required>
+
+        <label for="content">글 내용:(툴팁으로 제공됩니다.)</label>
+        <textarea name="content" id="content" rows="5" required></textarea>
+
+        <label for="date">작성 날짜 (YYYY-MM-DD):</label>
+        <input type="date" name="date" id="date">
+
+        <label for="html_file">HTML 파일:</label>
+        <input type="file" name="html_file" id="html_file" accept=".html,.htm" required onchange="updateHtmlName(this)">
+
+        <label for="image_files">이미지 파일들:(확장자는 png, jpg, jpeg, gif, svg 만 가능합니다.)</label>
+        <input type="file" name="image_files[]" id="image_files" accept="image/png, image/jpeg, image/gif, image/svg+xml" multiple onchange="previewImages(this)">
+
+        <div class="image-preview" id="imagePreview"></div>
+
+        <input type="submit" value="업로드">
+    </form>
+    <div id="uploadStatus"></div>
+    <a href="{{ url_for('index') }}" class="home-link">홈으로 돌아가기</a>
+
+    <script>
+        function updateHtmlName(input) {
+            if (input.files && input.files[0]) {
+                var fileName = input.files[0].name;
+                // Remove the .html extension if present
+                fileName = fileName.replace(/\.html$/, '');
+                document.getElementById('name').value = fileName;
+                
+                // 서버에 기존 파일 확인 요청
+                fetch('/check_existing', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({filename: fileName + '.html'})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        // 기존 데이터로 폼 채우기
+                        document.getElementById('title').value = data.title;
+                        document.getElementById('content').value = data.content;
+                        document.getElementById('date').value = data.date;
+                    } else {
+                        // 폼 초기화
+                        document.getElementById('title').value = '';
+                        document.getElementById('content').value = '';
+                        document.getElementById('date').value = '';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+
+        function previewImages(input) {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = ''; // Clear previous previews
+
+            if (input.files) {
+                Array.from(input.files).forEach(file => {
+                    if (!file.type.startsWith('image/')){ return }
+
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        preview.appendChild(img);
+                    }
+
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const statusDiv = document.getElementById('uploadStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = '업로드 중... 잠시만 기다려주세요.';
+
+            fetch(this.action, {
+                method: 'POST',
+                body: new FormData(this),
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest' // AJAX 요청임을 서버에 알림
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    statusDiv.innerHTML = data.message;
+                    setTimeout(() => {
+                        window.location.href = "{{ url_for('index') }}";
+                    }, 2000);
+                } else {
+                    statusDiv.innerHTML = '업로드 실패: ' + data.message;
+                }
+            })
+            .catch(error => {
+                statusDiv.innerHTML = '오류 발생: ' + error.message;
+            });
+        });
+    </script>
+</body>
+</html>
