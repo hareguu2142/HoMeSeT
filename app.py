@@ -6,6 +6,7 @@ from pymongo import MongoClient
 from bs4 import BeautifulSoup
 from datetime import datetime
 from github import Github, GithubException
+import os
 from dotenv import load_dotenv
 
 # .env 파일 로드
@@ -16,10 +17,10 @@ GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
 GITHUB_REPO = os.getenv('GITHUB_REPO')
 MONGO_URI = os.getenv('MONGO_URI')
 
+
 # Flask 애플리케이션 설정
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.secret_key = 'your_secret_key'  # 실제 배포 시 안전한 비밀 키 사용
 
 # 업로드 설정
 ALLOWED_EXTENSIONS_HTML = {'html', 'htm'}

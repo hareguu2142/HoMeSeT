@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>동전 뒤집기</title>
+<link href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"></script>
+<style>
+        body {
+            font-family: 'Noto Sans KR', Arial, sans-serif;
+            line-height: 1.8;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        header {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            padding: 20px;
+            text-align: center;
+            color: #ffffff;
+            border-radius: 10px 10px 0 0;
+            position: relative;
+        }
+        h1, h2, h3, h4 {
+            color: #4a4a4a;
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 2.5rem;
+        }
+        h2 {
+            margin-top: 30px;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #6e8efb;
+            padding-bottom: 10px;
+        }
+        h3 {
+            font-size: 1.5rem;
+            margin-top: 25px;
+        }
+        h4 {
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+        .math-container {
+            margin-top: 30px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        ul, ol {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        a {
+            color: #6e8efb;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        a:hover {
+            color: #a777e3;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #777;
+        }
+        .home-button {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: #6e8efb;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .home-button:hover {
+            background-color: #6e8efb;
+            color: #ffffff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #ffffff;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+        }
+        thead {
+            background-color: #6e8efb;
+            color: #ffffff;
+        }
+        th {
+            font-weight: 600;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        tbody tr:hover {
+            background-color: #e9ecef;
+            transition: background-color 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<header>
+<a class="home-button" href="/" title="메인 페이지로 돌아가기">🏠</a>
+<h1>동전 뒤집기 문제의 잉여류(Coset)를 이용한 증명</h1>
+</header>
+<div class="math-container">
+<p>세 개의 앞면이 보이는 동전을 가지고, 두 개씩 선택하여 뒤집는 과정을 통해 모든 동전이 뒷면이 되도록 하는 것이 <strong>불가능함</strong>을 <strong>군론(Group Theory)</strong>과 <strong>잉여류(Coset)</strong>의 개념을 활용하여 설명하겠습니다.</p>
+<h2>문제 설정</h2>
+<ul>
+<li><strong>동전 3개</strong>: 각 동전은 앞면(H) 또는 뒷면(T)을 가질 수 있습니다.</li>
+<li><strong>가능한 동작</strong>: 한 번에 <strong>두 개의 동전</strong>을 선택하여 <strong>동시에 뒤집습니다</strong>.</li>
+<li><strong>초기 상태</strong>: 모든 동전이 앞면(HHH)을 보입니다.</li>
+<li><strong>목표 상태</strong>: 모든 동전이 뒷면(TTT)을 보입니다.</li>
+<li><strong>목표</strong>: 가능한 동작을 통해 초기 상태에서 목표 상태로 도달할 수 있는지 확인합니다.</li>
+</ul>
+<h2>군 이론을 통한 모델링</h2>
+<h3>1. 아벨 군 구성</h3>
+<p>각 동전의 상태를 $\mathbb{Z}_2$로 표현합니다:</p>
+<ul>
+<li>앞면(H): $0$</li>
+<li>뒷면(T): $1$</li>
+</ul>
+<p>전체 상태 공간은 $\mathbb{Z}_2 \times \mathbb{Z}_2 \times \mathbb{Z}_2$로 구성된 <strong>아벨 군</strong>입니다.</p>
+<ul>
+<li>이 군의 원소는 $(a, b, c)$로 표현되며, $a, b, c \in \mathbb{Z}_2$입니다.</li>
+<li>덧셈 연산은 성분별로 이루어집니다 $(\text{mod } 2)$.</li>
+</ul>
+<h3>2. 동작의 군 원소 표현</h3>
+<p>가능한 동작은 두 개의 동전을 뒤집는 것이므로, 해당 위치에 $1$을 더하는 것으로 표현됩니다.</p>
+<ul>
+<li>동전 1과 2를 뒤집기: $v_1 = (1, 1, 0)$</li>
+<li>동전 1과 3을 뒤집기: $v_2 = (1, 0, 1)$</li>
+<li>동전 2과 3을 뒤집기: $v_3 = (0, 1, 1)$</li>
+</ul>
+<p>동작들의 집합은 이들 벡터에 의해 생성되는 부분군 $H$입니다.</p>
+<h3>3. 부분군 $H$의 생성</h3>
+<p>$H = \langle v_1, v_2, v_3 \rangle$</p>
+<p>$H$는 $\mathbb{Z}_2^3$의 부분군으로, 가능한 모든 동작의 결과를 포함합니다.</p>
+<p>$H$의 원소들은 다음과 같습니다:</p>
+<ul>
+<li>$(0, 0, 0)$ : 아무 동작도 하지 않음 (항등원)</li>
+<li>$(1, 1, 0)$ : $v_1$</li>
+<li>$(1, 0, 1)$ : $v_2$</li>
+<li>$(0, 1, 1)$ : $v_3$</li>
+</ul>
+<h3>4. 부분군 $H$의 특징</h3>
+<p>$H$의 모든 원소에서 성분들의 합은 <strong>짝수</strong>입니다:</p>
+<ul>
+<li>예를 들어, $(1, 1, 0)$에서 $1 + 1 + 0 = 2 \equiv 0 \pmod{2}$</li>
+</ul>
+<p>따라서 $H$는 성분들의 합이 짝수인 원소들로 구성됩니다.</p>
+<h4 id="closure-property">부분군 $H$의 닫힘 성질</h4>
+<p>부분군의 닫힘 성질을 확인하기 위해 $H$의 모든 원소 간의 덧셈을 직접 계산하여 결과가 다시 $H$에 속하는지 확인해보겠습니다.</p>
+<table>
+    <thead>
+        <tr>
+            <th>$+$</th>
+            <th>$(0,0,0)$</th>
+            <th>$(1,1,0)$</th>
+            <th>$(1,0,1)$</th>
+            <th>$(0,1,1)$</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>$(0,0,0)$</th>
+            <td>$(0,0,0)$</td>
+            <td>$(1,1,0)$</td>
+            <td>$(1,0,1)$</td>
+            <td>$(0,1,1)$</td>
+        </tr>
+        <tr>
+            <th>$(1,1,0)$</th>
+            <td>$(1,1,0)$</td>
+            <td>$(0,0,0)$</td>
+            <td>$(0,1,1)$</td>
+            <td>$(1,0,1)$</td>
+        </tr>
+        <tr>
+            <th>$(1,0,1)$</th>
+            <td>$(1,0,1)$</td>
+            <td>$(0,1,1)$</td>
+            <td>$(0,0,0)$</td>
+            <td>$(1,1,0)$</td>
+        </tr>
+        <tr>
+            <th>$(0,1,1)$</th>
+            <td>$(0,1,1)$</td>
+            <td>$(1,0,1)$</td>
+            <td>$(1,1,0)$</td>
+            <td>$(0,0,0)$</td>
+        </tr>
+    </tbody>
+</table>
+<p>위 표에서 볼 수 있듯이, $H$의 모든 원소를 더한 결과는 항상 다시 $H$에 속합니다. 따라서 $H$는 군의 닫힘 성질을 만족합니다.</p>
+<h2>잉여류(Coset)를 통한 분석</h2>
+<h3>1. 전체 군의 분할</h3>
+<p>전체 군 $\mathbb{Z}_2^3$은 부분군 $H$와 그 여잉여류로 분할됩니다.</p>
+<p>여잉여류는 부분군 $H$에 원소 $(1, 1, 1)$을 더한 집합입니다:</p>
+<p>$H + (1, 1, 1) = \{ h + (1, 1, 1) \mid h \in H \}$</p>
+<p><strong>여잉여류의 원소들은 성분들의 합이 홀수</strong>입니다.</p>
+<h3>2. 초기 상태와 목표 상태의 위치</h3>
+<ul>
+<li><strong>초기 상태 $(0, 0, 0)$</strong>:
+                    <ul>
+<li>성분들의 합: $0 + 0 + 0 = 0$ (짝수)</li>
+<li>따라서 부분군 $H$에 속합니다.</li>
+</ul>
+</li>
+<li><strong>목표 상태 $(1, 1, 1)$</strong>:
+                    <ul>
+<li>성분들의 합: $1 + 1 + 1 = 3$ (홀수)</li>
+<li>따라서 여잉여류 $H + (1, 1, 1)$에 속합니다.</li>
+</ul>
+</li>
+</ul>
+<h3>3. 구체적인 증명</h3>
+<ul>
+<li>동작을 통해 이동할 수 있는 상태들은 모두 부분군 $H$ 내에 있습니다.</li>
+<li>초기 상태는 $H$에 속하고, 목표 상태는 $H$의 여잉여류에 속하므로, <strong>동작을 통해 목표 상태로 이동할 수 없습니다</strong>.</li>
+<li><strong>이유</strong>: 부분군 $H$의 원소들로만 생성할 수 있는 상태는 $H$ 내에 제한되기 때문입니다.
+                    (<a href="#closure-property">위의 표를 참고</a>)</li>
+</ul>
+<h2>결론</h2>
+<ul>
+<li><strong>잉여류의 관점에서</strong>:
+                    <ul>
+<li>초기 상태와 목표 상태는 서로 다른 잉여류에 속하므로, 동작을 통해 하나에서 다른 하나로 이동할 수 없습니다.</li>
+</ul>
+</li>
+<li><strong>따라서</strong>, 두 개씩 동전을 뒤집는 동작으로는 세 개의 동전을 모두 뒷면으로 만들 수 없습니다.</li>
+</ul>
+<hr/>
+<h2>추가적인 설명</h2>
+<h3>왜 성분들의 합이 중요한가?</h3>
+<p>두 개의 동전을 뒤집는 동작은 성분별로 벡터를 더하는 것과 같습니다.</p>
+<ul>
+<li>각 동작은 성분들의 합에 영향을 주지만, 그 합의 <strong>짝수/홀수성(패리티)</strong>은 변하지 않습니다.</li>
+<li>부분군 $H$의 모든 원소는 성분들의 합이 짝수이며, 이는 동작을 반복해도 변하지 않습니다.</li>
+</ul>
+<h3>동작의 제한성</h3>
+<ul>
+<li>가능한 동작으로 생성되는 부분군 $H$는 전체 군의 절반만을 포함합니다.</li>
+<li>나머지 절반은 $H$의 여잉여류이며, 동작으로는 도달할 수 없는 상태들입니다.</li>
+</ul>
+<h3>잉여류를 통한 직관적 이해</h3>
+<ul>
+<li>잉여류는 군을 부분군에 대한 동치류로 분할합니다.</li>
+<li>이 경우, 동작으로 이동 가능한 상태들은 초기 상태가 속한 잉여류 내에 제한됩니다.</li>
+<li>초기 상태와 목표 상태가 다른 잉여류에 속하므로, 동작으로 목표 상태에 도달할 수 없습니다.</li>
+</ul>
+<hr/>
+<p><strong>종합하면</strong>, 수학의 <strong>잉여류(Coset)</strong> 개념을 활용하여, 두 개의 동전을 동시에 뒤집는 동작으로는 세 개의 동전을 모두 뒷면으로 만들 수 없음을 증명하였습니다. 이는 초기 상태와 목표 상태가 서로 다른 잉여류에 속하기 때문입니다.</p>
+</div>
+<div class="footer">
+<p>이 페이지의 수식은 KaTeX를 사용하여 렌더링되었습니다.</p>
+</div>
+</div>
+<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ]
+            });
+        });
+    </script>
+</body>
+</html>
