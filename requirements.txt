@@ -3,3 +3,4 @@ PyGithub
 pymongo
 beautifulsoup4
 python-dotenv
+Werkzeug
