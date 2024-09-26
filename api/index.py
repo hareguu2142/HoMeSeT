@@ -7,6 +7,7 @@ from github import Github, GithubException
 import os
 import base64
 from dotenv import load_dotenv
+from werkzeug.security import generate_password_hash
 
 # .env 파일 로드
 load_dotenv()
@@ -123,6 +124,12 @@ def process_upload(html_file):
         else:
             flash(f"{image.filename}은(는) 허용되지 않는 파일 형식입니다.")
 
+    # 비밀번호 처리
+    password = request.form.get('password')
+    if not password:
+        return handle_error('비밀번호는 필수 입력 사항입니다.')
+    hashed_password = generate_password_hash(password)
+
     # MongoDB에 데이터 저장 또는 업데이트
     name = os.path.splitext(html_filename)[0]
     document = {
@@ -131,7 +138,8 @@ def process_upload(html_file):
         'content': request.form.get('content'),
         'date': parse_date(request.form.get('date')),
         'filename': html_filename,
-        'images': uploaded_images
+        'images': uploaded_images,
+        'password': hashed_password  # 해싱된 비밀번호 추가
     }
 
     existing_doc = collection.find_one({'name': name})
