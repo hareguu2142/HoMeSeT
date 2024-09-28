@@ -7,7 +7,8 @@ from github import Github, GithubException
 import os
 import base64
 from dotenv import load_dotenv
-from werkzeug.security import generate_password_hash
+# Removed the hashing import as it's no longer used
+# from werkzeug.security import generate_password_hash
 
 # .env 파일 로드
 load_dotenv()
@@ -67,16 +68,16 @@ def upload():
     if request.method == 'POST':
         if 'html_file' not in request.files:
             return handle_error('HTML 파일이 없습니다.')
-        
+
         html_file = request.files['html_file']
         if html_file.filename == '':
             return handle_error('선택된 HTML 파일이 없습니다.')
-        
+
         if html_file and allowed_file(html_file.filename, ALLOWED_EXTENSIONS_HTML):
             return process_upload(html_file)
         else:
             return handle_error('허용되지 않은 파일 형식입니다.')
-    
+
     return render_template('upload.html')
 
 def handle_error(message):
@@ -126,9 +127,15 @@ def process_upload(html_file):
 
     # 비밀번호 처리
     password = request.form.get('password')
-    if not password:
-        return handle_error('비밀번호는 필수 입력 사항입니다.')
-    hashed_password = generate_password_hash(password)
+    # Removed the mandatory password check
+    # if not password:
+    #     return handle_error('비밀번호는 필수 입력 사항입니다.')
+    if password:
+        # Store password in plain text
+        # Optionally, you can validate or sanitize the password here
+        plain_password = password
+    else:
+        plain_password = None
 
     # MongoDB에 데이터 저장 또는 업데이트
     name = os.path.splitext(html_filename)[0]
@@ -138,9 +145,11 @@ def process_upload(html_file):
         'content': request.form.get('content'),
         'date': parse_date(request.form.get('date')),
         'filename': html_filename,
-        'images': uploaded_images,
-        'password': hashed_password  # 해싱된 비밀번호 추가
+        'images': uploaded_images
     }
+
+    if plain_password:
+        document['password'] = plain_password  # 평문 비밀번호 추가
 
     existing_doc = collection.find_one({'name': name})
     if existing_doc:
